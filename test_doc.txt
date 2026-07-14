@@ -1,0 +1,5 @@
+Acme Vendor Information Security Policy.
+MFA is fully enabled on all user portals.
+Encryption of data at rest uses AES-256 keys managed manually by the IT team.
+There is no mention of a standard data retention period in our policies.
+We claim automatic daily backups, but legal terms state manual backups occur weekly.
