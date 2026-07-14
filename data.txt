@@ -1,0 +1,87 @@
+ACME CLOUD SERVICES
+VENDOR OVERVIEW AND SECURITY PRACTICES REPORT
+Prepared for: Due Diligence Review
+Document Type: Vendor-Submitted Narrative Overview
+ 
+ 
+COMPANY BACKGROUND
+ 
+Acme Cloud Services is a mid-sized software vendor headquartered in Austin, Texas, providing cloud-based document storage and collaboration tools to enterprise customers across North America and Europe. The company was founded eight years ago and currently employs approximately four hundred and eighty people, with engineering, security, and customer support functions distributed across three offices. Acme's flagship product is used by over six hundred corporate customers, ranging from mid-market companies to several Fortune 500 accounts. The company has grown steadily over the past three years and has invested in expanding its security and compliance function in response to customer demand, including hiring a dedicated Chief Information Security Officer eighteen months ago.
+ 
+Acme positions itself as a security-conscious vendor and frequently highlights its certifications and third-party audits in its marketing materials. The company has undergone a SOC 2 Type II examination and periodic penetration testing, both of which are referenced later in this report. Acme's leadership has stated a commitment to closing any outstanding security gaps identified through these processes, though the pace of remediation has varied across different findings.
+ 
+ 
+INFORMATION SECURITY PRACTICES
+ 
+Acme requires multi-factor authentication for all customer-facing portal logins, and this control cannot be disabled by individual customer administrators. The company describes this as a mandatory, platform-wide protection that applies uniformly regardless of customer size or contract tier. Internally, however, the picture is somewhat different. Administrative access to Acme's production systems, including the infrastructure that hosts customer data, does not currently require multi-factor authentication. Acme has acknowledged this gap in written correspondence with several customers and has indicated that multi-factor authentication for administrative accounts is planned for a future release, though no committed delivery date has been provided as of this report.
+ 
+With respect to encryption, Acme encrypts all customer data at rest using industry-standard AES-256 encryption. The encryption keys used for this purpose are managed manually by Acme's internal IT operations team, with key rotation performed annually during a scheduled maintenance window. Data in transit is protected using TLS version 1.2 or higher across all customer-facing endpoints. While the encryption algorithm itself is considered strong by current industry standards, the manual nature of key management is worth noting, as automated key management and rotation is generally considered a stronger control than manual processes, particularly at Acme's scale of operation.
+ 
+Acme's network architecture includes a segmented production environment, with administrative interfaces kept separate from customer-facing services. The company also employs a web application firewall and intrusion detection tooling across its primary hosting region.
+ 
+ 
+DATA HANDLING, BACKUP, AND RETENTION
+ 
+Acme has represented that backups of customer data are performed automatically every night and are replicated across two geographically separate hosting regions to protect against regional outages. This is described in Acme's customer-facing security questionnaire as a fully automated process requiring no manual intervention under normal operating conditions.
+ 
+Separately, in the executed Data Processing Agreement between Acme and its customers, Acme states that it performs manual verification of backup integrity on a weekly basis, with the results of this verification logged in an internal operations tracker. This manual verification process is described as distinct from the nightly backup job itself, though the contractual language does not clearly reconcile how a fully automated nightly backup process relates to a weekly manual verification cadence, and it is not clear from the materials provided whether the manual verification is simply a check on the automated process or whether backups themselves involve a manual step at some point in the pipeline. This is an area that would benefit from clarification directly with the vendor.
+ 
+On the subject of data retention, Acme's security questionnaire does not specify a retention period for customer data following contract termination. The Data Processing Agreement, however, does address this point, committing to retain customer data for a period of ninety days following termination of the underlying services agreement, after which data is securely deleted unless a longer retention period is required by applicable law. Notably, Acme's most recent SOC 2 Type II report explicitly states that data retention controls were not within the scope of that examination period, meaning the ninety-day commitment described in the contract has not been independently verified by the auditor.
+ 
+For business continuity, Acme's Data Processing Agreement commits to a Recovery Time Objective of twenty-four hours and a Recovery Point Objective of four hours, with failover testing intended to occur on an annual basis according to internal policy.
+ 
+ 
+PRIVACY AND DATA PROCESSING
+ 
+Acme processes account information, platform usage logs, and any content that customers choose to upload to the platform on behalf of its customers. The company relies on two named sub-processors for infrastructure hosting and transactional email delivery, and states that a current list of sub-processors is available to customers upon request, though this list was not included in the materials submitted for this review.
+ 
+Customer data may be transferred between Acme's two primary hosting regions, located in the United States and Western Europe, for the purposes of backup and redundancy. Acme states that these transfers are governed by Standard Contractual Clauses where applicable. In the event of a confirmed data breach affecting customer data, Acme has committed to notifying affected customers within seventy-two hours of confirming that a breach has occurred, which the company describes as consistent with its contractual and regulatory obligations.
+ 
+ 
+COMPLIANCE AND AUDIT HISTORY
+ 
+Acme has completed a SOC 2 Type II examination covering its production environment. The resulting report notes that encryption controls, both for data at rest and data in transit, were operating effectively during the audit period with no exceptions noted. However, the same report identifies an exception related to privileged access reviews, noting that quarterly access reviews for privileged accounts were not performed during two of the four quarters under review. Acme's management has represented, through the auditor's report, that remediation of this exception is currently in progress.
+ 
+The SOC 2 report also notes that the last full disaster recovery failover test was conducted approximately eighteen months prior to the report date, which does not appear consistent with the annual testing cadence described elsewhere in Acme's contractual commitments. The report does not identify any compensating controls in place to address this gap in testing frequency, and it is unclear from the materials provided whether a more recent failover test has since been conducted.
+ 
+In addition to the SOC 2 examination, Acme commissioned an independent penetration test of its production environment, conducted over a two-week engagement by a third-party security firm. The resulting executive summary identified three findings of varying severity. The highest-severity finding noted that the administrative login endpoint does not enforce multi-factor authentication, which the testing firm flagged as increasing risk in the event that administrative credentials are compromised. This finding is consistent with, and corroborates, the same gap described earlier in this report regarding administrative access controls. A medium-severity finding, related to verbose error messages on an internal API endpoint that could reveal technical details to an authenticated user, has since been remediated according to Acme. A lower-severity finding concerning a deprecated cipher suite supported by one legacy load balancer remains open at the time of this report. A retest to confirm remediation status is scheduled for the coming quarter.
+ 
+ 
+EMPLOYEE ACCESS AND PERSONNEL SECURITY
+ 
+Acme performs background checks on all employees prior to hire, consistent with applicable local law in each of its office locations. Access to production systems is granted on a role-based basis, with new employees granted only the minimum level of access required for their role at the time of onboarding. Acme states that access is reviewed periodically, though as noted in the SOC 2 exception described above, this review did not occur on the stated quarterly cadence during two of the four quarters covered by the most recent audit period.
+ 
+Employees with access to production systems are required to complete annual security awareness training, and Acme reports a completion rate above ninety percent for the most recent training cycle, though the specific figure was not independently verified as part of this review. Departing employees have their system access revoked as part of Acme's offboarding checklist, which is executed by the IT operations team in coordination with each employee's manager. Acme did not provide documentation of the average time between an employee's departure and the revocation of their access, which may be a reasonable follow-up question depending on the sensitivity of the systems involved.
+ 
+Contractors and third-party personnel who require access to Acme systems are subject to the same access provisioning process as employees, though Acme's documentation does not clearly state whether contractors are subject to the same background check requirements as full-time staff.
+ 
+ 
+PHYSICAL SECURITY AND DATA CENTER OPERATIONS
+ 
+Acme does not operate its own physical data centers. Instead, the company relies on infrastructure provided by two major cloud hosting providers, one for its primary United States region and one for its European region. Physical security, environmental controls, and facility access management at the underlying data center level are the responsibility of these hosting providers, and Acme relies on the hosting providers' own compliance certifications, including their respective SOC 2 reports, as evidence of physical security controls. Acme's own security questionnaire references these third-party certifications but does not include the underlying reports as part of the materials submitted for this review.
+ 
+Acme's own office locations, where engineering and support staff are based, employ badge-based access control and visitor sign-in procedures. Production systems are not physically accessible from Acme's office locations, as all infrastructure is hosted with the cloud providers referenced above.
+ 
+ 
+SUBPROCESSOR AND THIRD-PARTY RISK MANAGEMENT
+ 
+As noted earlier, Acme relies on two named sub-processors: one for underlying infrastructure hosting and one for transactional email delivery used in account notifications. Acme states that it performs a security review of any new sub-processor prior to onboarding, and that existing sub-processors are reviewed on an annual basis, though the specific criteria used in these reviews were not detailed in the materials provided. Customers are notified of any change to Acme's sub-processor list in accordance with the terms of the Data Processing Agreement, typically with a notice period that allows customers to object prior to the change taking effect.
+ 
+Acme did not provide a copy of its own vendor risk management policy as part of this submission, which would typically describe how the company evaluates and monitors the security posture of its own suppliers and sub-processors on an ongoing basis. This may be a reasonable item to request directly from Acme as part of any follow-up.
+ 
+ 
+INCIDENT RESPONSE AND CUSTOMER COMMUNICATION
+ 
+Acme maintains a documented incident response process, which is invoked in the event of a suspected security incident affecting the production environment. The process includes defined roles for incident triage, containment, and customer communication. As referenced in the privacy section of this report, Acme has committed to notifying affected customers within seventy-two hours of confirming a data breach. Acme's materials describe this as a company-wide policy rather than something negotiated on a per-customer basis, though enterprise customers with specific contractual notification requirements are handled according to the terms of their individual agreements where those terms are stricter than the general policy.
+ 
+Acme did not provide documentation of any actual security incidents that have occurred to date, nor any history of past breach notifications, and it is unclear from the materials provided whether this reflects an absence of reportable incidents or simply that such history was not included in this particular submission.
+ 
+ 
+FINANCIAL STABILITY AND INSURANCE
+ 
+Acme is a privately held company and does not publish detailed financial statements. The company has stated in correspondence with prospective customers that it maintains cybersecurity liability insurance, though the specific coverage limits and policy terms were not included in the materials submitted for this review. Acme has been operating for eight years and reports steady growth in its customer base over the past three years, which may be relevant context when assessing the vendor's overall stability, though this report does not independently verify Acme's financial position.
+ 
+ 
+SUMMARY OBSERVATIONS
+ 
+Taken together, the materials submitted by Acme Cloud Services present a vendor with generally reasonable baseline security practices, including encryption of data at rest and in transit, customer-facing multi-factor authentication, role-based access provisioning, and a documented business continuity commitment. At the same time, several points across the submitted documents warrant follow-up before this review can be considered complete. These include the absence of multi-factor authentication on administrative access, corroborated independently by both the Data Processing Agreement and the penetration test report; an apparent inconsistency between the description of backups as fully automated versus a separately described manual weekly verification process; the fact that data retention commitments made in the contract have not been independently audited, since retention was explicitly excluded from the scope of the SOC 2 examination; a disaster recovery testing cadence that does not appear to match the annual testing commitment stated elsewhere; and a lapse in the quarterly privileged access review cadence during half of the most recent audit period. None of these observations are necessarily disqualifying on their own, but they represent exactly the kind of gaps and follow-up questions a due diligence review is intended to surface before a renewal or approval decision is made.
