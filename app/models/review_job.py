@@ -2,8 +2,8 @@ import enum
 import uuid
 from datetime import datetime
 
-from sqlalchemy import Enum, ForeignKey, Integer, String, Text
-from sqlalchemy.dialects.postgresql import JSONB, UUID
+from sqlalchemy import Enum, ForeignKey, Integer, String, Text, JSON
+from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.sql import func
 
@@ -40,12 +40,12 @@ class ReviewJob(Base):
 
     # Configuration captured now, used from Milestone 4 onward
     analysis_depth: Mapped[str] = mapped_column(String(20), default="standard", nullable=False)
-    enabled_checks: Mapped[list | None] = mapped_column(JSONB, nullable=True)  # List of check IDs to execute
+    enabled_checks: Mapped[list | None] = mapped_column(JSON, nullable=True)  # List of check IDs to execute
     custom_instructions: Mapped[str | None] = mapped_column(Text, nullable=True)  # Injected context mid-review
 
     # LangGraph Execution Checkpointing
     current_node: Mapped[str | None] = mapped_column(String(100), nullable=True)
-    paused_state: Mapped[dict | None] = mapped_column(JSONB, nullable=True)     # Serialized workflow state dict
+    paused_state: Mapped[dict | None] = mapped_column(JSON, nullable=True)     # Serialized workflow state dict
 
     # Milestone 3 — progress tracking (updated by ingestion pipeline)
     progress_pct: Mapped[int] = mapped_column(Integer, default=0, nullable=False)

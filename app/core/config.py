@@ -24,7 +24,7 @@ class Settings(BaseSettings):
     # Async URL (asyncpg driver) -- used by both the running app and Alembic
     # migrations (we use alembic's async template, so no separate sync URL
     # is needed).
-    DATABASE_URL: str = "postgresql+asyncpg://dd_user:dd_pass@localhost:5432/vendor_dd"
+    DATABASE_URL: str = "sqlite+aiosqlite:///./vendor_dd.db"
 
     # --- Auth / JWT ---
     JWT_SECRET_KEY: str = "CHANGE_ME_IN_ENV"  # noqa: S105 - overridden via .env in real use

@@ -1,20 +1,17 @@
 """
 Retrieval service — semantic search over embedded document chunks.
-
-Embeds the user's query and runs a pgvector cosine similarity search
-over document_chunks for a specific review job. Returns the top-k
-most relevant chunks with source document references.
-
-Called by the POST /reviews/{id}/search endpoint (FR-2.5).
+Uses Python-based cosine similarity to remain compatible with SQLite.
 """
 import logging
 import uuid
+import math
 from dataclasses import dataclass
 
-from pgvector.sqlalchemy import Vector
-from sqlalchemy import Column, Integer, String, Text, cast, func, literal, text
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.models.chunk import DocumentChunk
+from app.models.document import Document
 from app.services.embedding import embed_single
 
 logger = logging.getLogger(__name__)
@@ -32,6 +29,15 @@ class ChunkResult:
     similarity: float
 
 
+def cosine_similarity(v1: list[float], v2: list[float]) -> float:
+    if not v1 or not v2:
+        return 0.0
+    dot_product = sum(x * y for x, y in zip(v1, v2))
+    norm_a = math.sqrt(sum(x * x for x in v1))
+    norm_b = math.sqrt(sum(y * y for y in v2))
+    return dot_product / (norm_a * norm_b) if (norm_a * norm_b) else 0.0
+
+
 async def search_chunks(
     review_job_id: uuid.UUID,
     query: str,
@@ -40,12 +46,7 @@ async def search_chunks(
 ) -> list[ChunkResult]:
     """
     Find the most relevant document chunks for a natural language query.
-
-    1. Embed the query string.
-    2. Run pgvector cosine similarity search scoped to the review job.
-    3. Return top_k results with source document references.
-
-    Returns an empty list if the review has no embedded chunks yet.
+    Uses in-memory cosine similarity compatible with SQLite.
     """
     if not query.strip():
         return []
@@ -53,46 +54,33 @@ async def search_chunks(
     # Embed the query
     query_embedding = await embed_single(query)
 
-    # pgvector cosine distance operator: <=>
-    # asyncpg conflicts with ::vector cast in raw SQL alongside :param bindings.
-    # Solution: embed the vector literal directly into the SQL string (safe —
-    # it's a float array from OpenAI, not user input) and use :param only for
-    # the scalar UUIDs and integers.
-    vec_literal = "[" + ",".join(str(f) for f in query_embedding) + "]"
-
-    sql = text(f"""
-        SELECT
-            dc.id::text            AS chunk_id,
-            dc.document_id::text   AS document_id,
-            d.original_filename    AS source_filename,
-            dc.chunk_index,
-            dc.content,
-            1 - (dc.embedding <=> '{vec_literal}'::vector) AS similarity
-        FROM document_chunks dc
-        JOIN documents d ON d.id = dc.document_id
-        WHERE dc.review_job_id = :review_job_id
-          AND dc.embedding IS NOT NULL
-        ORDER BY dc.embedding <=> '{vec_literal}'::vector
-        LIMIT :top_k
-    """)
-
-    result = await db.execute(
-        sql,
-        {
-            "review_job_id": str(review_job_id),
-            "top_k": top_k,
-        },
+    # Fetch all chunks and document names
+    stmt = (
+        select(DocumentChunk, Document.original_filename)
+        .join(Document, Document.id == DocumentChunk.document_id)
+        .where(DocumentChunk.review_job_id == review_job_id)
+        .where(DocumentChunk.embedding != None)
     )
-    rows = result.fetchall()
+
+    result = await db.execute(stmt)
+    rows = result.all()
+
+    scored_results = []
+    for chunk, original_filename in rows:
+        sim = cosine_similarity(chunk.embedding, query_embedding)
+        scored_results.append((chunk, original_filename, sim))
+
+    # Sort by similarity descending
+    scored_results.sort(key=lambda x: x[2], reverse=True)
 
     return [
         ChunkResult(
-            chunk_id=row.chunk_id,
-            document_id=row.document_id,
-            source_filename=row.source_filename,
-            chunk_index=row.chunk_index,
-            content=row.content,
-            similarity=round(float(row.similarity), 4),
+            chunk_id=str(chunk.id),
+            document_id=str(chunk.document_id),
+            source_filename=original_filename,
+            chunk_index=chunk.chunk_index,
+            content=chunk.content,
+            similarity=round(sim, 4),
         )
-        for row in rows
+        for chunk, original_filename, sim in scored_results[:top_k]
     ]

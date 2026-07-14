@@ -2,7 +2,7 @@
 Embedding service — generates vector embeddings via the OpenAI API.
 
 Uses text-embedding-3-small (1536 dimensions), which matches the
-EMBEDDING_DIM constant in document.py and the Vector(1536) pgvector column.
+EMBEDDING_DIM constant in document.py and the JSON embedding column.
 
 Batches calls to stay within the OpenAI token-per-request limit.
 Returns one embedding vector per input text, in the same order.

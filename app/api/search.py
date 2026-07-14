@@ -36,7 +36,7 @@ async def search_documents(
     """
     Search uploaded documents using natural language.
 
-    Embeds the query and runs a pgvector cosine similarity search over
+    Embeds the query and runs an SQLite-compatible cosine similarity search over
     all embedded chunks for this review job. Returns the top matching
     excerpts with source document references.
 
